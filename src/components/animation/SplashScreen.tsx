@@ -10,7 +10,7 @@ export default function SplashScreenWrapper({ children }: { children: ReactNode 
 
   useEffect(() => {
     // Load animation JSON
-    fetch('/animation/splash.json')
+    fetch('/animations/splash.json')
       .then((res) => res.json())
       .then((data) => setAnimationData(data))
       .catch((err) => console.error('Failed to load splash animation', err));
