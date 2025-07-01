@@ -27,7 +27,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="flex flex-col md:flex-row items-center gap-6">
                  <Image 
-                    src="https://placehold.co/600x400.png" 
+                    src="/assets/spend_report.png" 
                     alt="Theme customization illustration" 
                     width={250} 
                     height={160} 

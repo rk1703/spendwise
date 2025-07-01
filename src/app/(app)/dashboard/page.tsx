@@ -68,10 +68,6 @@ export default function DashboardPage() {
     }, {} as ChartConfig);
   }
 
-  console.log(spendingByCategory)
-// Suggested code may be subject to a license. Learn more: ~LicenseLog:1334357839.
-  console.log(categoryChartConfig)
-
   // Spending Over Time - calculate only if data is loaded
   let spendingOverTimeData: {month: string; total: number}[] = [];
   if (!loadingTransactions) {

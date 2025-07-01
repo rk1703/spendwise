@@ -3,14 +3,6 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  LayoutDashboard,
-  ArrowLeftRight,
-  Target,
-  PieChartIcon,
-  SettingsIcon,
-  type LucideIcon,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   SidebarMenu,
@@ -18,20 +10,7 @@ import {
   SidebarMenuButton,
   useSidebar, // Import useSidebar
 } from '@/components/ui/sidebar';
-
-interface NavItem {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-}
-
-const navItems: NavItem[] = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { href: '/budgets', label: 'Budgets', icon: Target },
-  { href: '/reports', label: 'Reports', icon: PieChartIcon },
-  { href: '/settings', label: 'Settings', icon: SettingsIcon },
-];
+import { navItems } from '@/constants';
 
 export function SidebarNav() {
   const pathname = usePathname();

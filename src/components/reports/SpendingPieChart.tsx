@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import {
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
+  ChartTooltipContent, 
   ChartLegend,
   ChartLegendContent,
   type ChartConfig
@@ -96,7 +96,7 @@ export function SpendingPieChart() {
             </Pie>
             <ChartLegend
               content={<ChartLegendContent nameKey="name" className="text-sm" />}
-              className="-mt-4"
+              className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
             />
           </PieChart>
         </ChartContainer>

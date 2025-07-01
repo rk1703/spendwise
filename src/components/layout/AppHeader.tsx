@@ -1,7 +1,6 @@
 
 "use client";
 
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { APP_NAME } from '@/constants';
 import { Coins, LogOut, UserCircle, Loader2, Moon, Sun, Laptop } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
@@ -13,10 +12,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuPortal
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTheme } from 'next-themes';
@@ -53,7 +48,6 @@ export function AppHeader() {
 
   return (
     <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 shadow-sm">
-      <SidebarTrigger className="md:hidden" />
       <div className="flex items-center gap-2">
         <Coins className="h-7 w-7 text-primary" />
         <h1 className="text-xl font-semibold text-foreground font-headline">{APP_NAME}</h1>

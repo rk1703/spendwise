@@ -88,6 +88,8 @@ const CategoryForm = ({ category, onSave, onCancel }: { category?: Category, onS
     setValue('icon', iconName, { shouldValidate: true });
   }
 
+  console.log(iconKeys);
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>

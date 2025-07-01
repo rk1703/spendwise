@@ -1,5 +1,12 @@
-
 import type { Category } from '@/lib/types';
+import type { LucideIcon } from 'lucide-react';
+import {
+  LayoutDashboard,
+  ArrowLeftRight,
+  Target,
+  PieChartIcon,
+  SettingsIcon,
+} from 'lucide-react';
 
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'food', name: 'Food', icon: 'Utensils', color: 'hsl(var(--chart-1))' },
@@ -23,3 +30,17 @@ export const LOCAL_STORAGE_KEYS = {
   CATEGORIES: 'spendwise_categories',
   BUDGETS: 'spendwise_budgets',
 };
+
+export interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+export const navItems: NavItem[] = [
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/budgets', label: 'Budgets', icon: Target },
+  { href: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
+  { href: '/reports', label: 'Reports', icon: PieChartIcon },
+  { href: '/settings', label: 'Settings', icon: SettingsIcon },
+];
