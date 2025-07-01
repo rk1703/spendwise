@@ -37,7 +37,8 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="SpendWise" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"/>
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000"/>
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
