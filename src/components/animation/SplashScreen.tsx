@@ -5,25 +5,31 @@ import Lottie from 'lottie-react';
 
 export default function SplashScreenWrapper({ children }: { children: ReactNode }) {
   const [fadeOut, setFadeOut] = useState(false);
-  const [showSplash, setShowSplash] = useState(true); // Always true on mount
+  const [showSplash, setShowSplash] = useState(false); // default: false
   const [animationData, setAnimationData] = useState<any>(null);
 
   useEffect(() => {
-    // Load animation JSON
-    fetch('/animations/splash.json')
-      .then((res) => res.json())
-      .then((data) => setAnimationData(data))
-      .catch((err) => console.error('Failed to load splash animation', err));
+    const hasShownSplash = sessionStorage.getItem('hasShownSplash');
+    if (!hasShownSplash) {
+      setShowSplash(true);
+      sessionStorage.setItem('hasShownSplash', 'true');
 
-    // Start fade at 5s
-    const fadeTimer = setTimeout(() => setFadeOut(true), 5000);
-    // Hide after 6s
-    const removeTimer = setTimeout(() => setShowSplash(false), 6000);
+      // Load animation JSON
+      fetch('/animations/splash.json')
+        .then((res) => res.json())
+        .then((data) => setAnimationData(data))
+        .catch((err) => console.error('Failed to load splash animation', err));
 
-    return () => {
-      clearTimeout(fadeTimer);
-      clearTimeout(removeTimer);
-    };
+      // Start fade at 5s
+      const fadeTimer = setTimeout(() => setFadeOut(true), 5000);
+      // Hide after 6s
+      const removeTimer = setTimeout(() => setShowSplash(false), 6000);
+
+      return () => {
+        clearTimeout(fadeTimer);
+        clearTimeout(removeTimer);
+      };
+    }
   }, []);
 
   if (showSplash) {
