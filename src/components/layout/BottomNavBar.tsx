@@ -23,7 +23,7 @@ export function BottomNavBar() {
             : pathname.startsWith(item.href);
           
           return (
-            <Tooltip key={item.href} delayDuration={100}>
+            <Tooltip key={item.href} delayDuration={50}>
               <TooltipTrigger asChild>
                 <Link
                   href={item.href}

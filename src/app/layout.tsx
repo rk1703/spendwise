@@ -7,6 +7,7 @@ import { ThemeProvider } from 'next-themes';
 import { APP_NAME } from '@/constants';
 import SplashScreenWrapper from '@/components/animation/SplashScreen';
 import { Inter } from "next/font/google";
+import { ThemeColorUpdater } from '@/components/ThemeColorUpdater';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
       { url: "/icons/icon-512x512.png", sizes: "512x512" },
     ],
   },
-  themeColor: "#000000",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -37,14 +38,14 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="SpendWise" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"/>
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000"/>
+        <meta name="theme-color" content="#ffffff"/>
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet"/>
       </head>
       <body className={inter.className}>
+        <ThemeColorUpdater />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

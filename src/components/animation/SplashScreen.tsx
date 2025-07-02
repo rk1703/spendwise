@@ -21,9 +21,9 @@ export default function SplashScreenWrapper({ children }: { children: ReactNode 
         .catch((err) => console.error('Failed to load splash animation', err));
 
       // Start fade at 5s
-      const fadeTimer = setTimeout(() => setFadeOut(true), 5000);
+      const fadeTimer = setTimeout(() => setFadeOut(true), 3000);
       // Hide after 6s
-      const removeTimer = setTimeout(() => setShowSplash(false), 6000);
+      const removeTimer = setTimeout(() => setShowSplash(false), 4000);
 
       return () => {
         clearTimeout(fadeTimer);
