@@ -14,7 +14,6 @@ import { Loader2 } from 'lucide-react';
 const budgetSchema = z.object({
   categoryId: z.string().min(1, 'Category is required'),
   amount: z.coerce.number().positive('Amount must be positive'),
-  period: z.enum(['monthly', 'yearly']),
 });
 
 type BudgetFormData = z.infer<typeof budgetSchema>;
@@ -32,15 +31,15 @@ export function BudgetForm({ budget, onSave, onCancel }: BudgetFormProps) {
     defaultValues: {
       categoryId: budget?.categoryId || '',
       amount: budget?.amount || undefined,
-      period: budget?.period || 'monthly',
     },
   });
 
   const onSubmit = (data: BudgetFormData) => {
+    const budgetData = { ...data, period: 'monthly' as const };
     if (budget) {
-      updateBudget({ ...data, id: budget.id });
+      updateBudget({ ...budgetData, id: budget.id });
     } else {
-      addBudget(data);
+      addBudget(budgetData);
     }
     onSave();
   };
@@ -71,29 +70,9 @@ export function BudgetForm({ budget, onSave, onCancel }: BudgetFormProps) {
       </div>
 
       <div>
-        <Label htmlFor="amount">Budget Amount</Label>
+        <Label htmlFor="amount">Monthly Budget Amount</Label>
         <Input id="amount" type="number" step="0.01" {...register('amount')} placeholder="e.g., 500" />
         {errors.amount && <p className="text-sm text-destructive mt-1">{errors.amount.message}</p>}
-      </div>
-
-      <div>
-        <Label htmlFor="period">Period</Label>
-        <Controller
-          name="period"
-          control={control}
-          render={({ field }) => (
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <SelectTrigger id="period">
-                <SelectValue placeholder="Select period" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="monthly">Monthly</SelectItem>
-                <SelectItem value="yearly">Yearly</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-        />
-        {errors.period && <p className="text-sm text-destructive mt-1">{errors.period.message}</p>}
       </div>
 
       <div className="flex justify-end gap-2 pt-4">

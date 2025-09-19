@@ -33,11 +33,16 @@ export function BudgetItem({ budget, onEdit }: BudgetItemProps) {
 
   const IconComponent = LucideIcons[category.icon as keyof typeof LucideIcons] || Tag;
 
-  // Calculate current spending for this budget's category and period
-  // For simplicity, this example assumes all transactions are within the current budget period.
-  // A more robust solution would filter transactions by date based on the budget period.
+  // Calculate current spending for this budget's category within the current month.
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
   const expenses = getTransactionsByCategory(budget.categoryId)
-    .filter(t => t.type === 'expense')
+    .filter(t => {
+      const transactionDate = new Date(t.date);
+      return t.type === 'expense' && transactionDate >= startOfMonth && transactionDate <= endOfMonth;
+    })
     .reduce((sum, t) => sum + t.amount, 0);
 
   const progress = budget.amount > 0 ? Math.min((expenses / budget.amount) * 100, 100) : 0;
@@ -80,7 +85,7 @@ export function BudgetItem({ budget, onEdit }: BudgetItemProps) {
             </div>
         </div>
         <CardDescription>
-          {budget.period.charAt(0).toUpperCase() + budget.period.slice(1)} limit: ₹{budget.amount.toFixed(2)}
+          Monthly limit: ₹{budget.amount.toFixed(2)}
         </CardDescription>
       </CardHeader>
       <CardContent>

@@ -23,7 +23,7 @@ export interface Budget {
   id: string;
   categoryId: string;
   amount: number;
-  period: 'monthly' | 'yearly'; // Or more granular like 'weekly'
+  period: 'monthly'; // Or more granular like 'weekly'
 }
 
 export interface ChartDataPoint {
