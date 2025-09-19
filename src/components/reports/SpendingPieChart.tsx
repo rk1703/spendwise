@@ -17,17 +17,45 @@ import { FileWarning } from 'lucide-react';
 export function SpendingPieChart() {
   const { transactions, categories } = useAppContext();
 
-  const expenseTransactions = transactions.filter(t => t.type === 'expense');
+  // Filter for current month expenses only
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+  const expenseTransactions = transactions.filter(t => {
+    if (t.type !== 'expense') return false;
+    const transactionDate = new Date(t.date);
+    return transactionDate >= startOfMonth && transactionDate <= endOfMonth;
+  });
+
+  // Define a comprehensive color palette with distinct, easily distinguishable colors
+  const colorPalette = [
+    '#3B82F6', // Blue
+    '#EF4444', // Red
+    '#10B981', // Green
+    '#F59E0B', // Amber
+    '#8B5CF6', // Purple
+    '#EC4899', // Pink
+    '#06B6D4', // Cyan
+    '#84CC16', // Lime
+    '#F97316', // Orange
+    '#6366F1', // Indigo
+    '#14B8A6', // Teal
+    '#A855F7', // Violet
+    '#22C55E', // Emerald
+    '#EAB308', // Yellow
+    '#DC2626', // Rose
+  ];
 
   const data: ChartDataPoint[] = categories
-    .map(category => {
+    .map((category, index) => {
       const categoryExpenses = expenseTransactions
         .filter(t => t.categoryId === category.id)
         .reduce((sum, t) => sum + t.amount, 0);
       return {
         name: category.name,
         value: categoryExpenses,
-        fill: category.color || `hsl(var(--chart-${(categories.indexOf(category) % 5) + 1}))` , // Use category color or default
+        fill: colorPalette[index % colorPalette.length], // Use category color or distinct palette color
       };
     })
     .filter(item => item.value > 0); // Only include categories with spending
@@ -44,12 +72,12 @@ export function SpendingPieChart() {
     return (
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Spending by Category</CardTitle>
-          <CardDescription>A visual breakdown of your expenses.</CardDescription>
+          <CardTitle>Monthly Spending by Category</CardTitle>
+          <CardDescription>A visual breakdown of your current month expenses.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center h-[350px]">
             <FileWarning className="w-16 h-16 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">No expense data available to display chart.</p>
+            <p className="text-muted-foreground">No monthly expense data available to display chart.</p>
         </CardContent>
       </Card>
     );
@@ -59,8 +87,8 @@ export function SpendingPieChart() {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle>Spending by Category</CardTitle>
-        <CardDescription>A visual breakdown of your expenses.</CardDescription>
+        <CardTitle>Monthly Spending by Category</CardTitle>
+        <CardDescription>A visual breakdown of your current month expenses.</CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center p-0">
         <ChartContainer config={chartConfig} className="aspect-square h-[350px]">
