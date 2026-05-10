@@ -41,9 +41,9 @@ export default function AIFinancialAssistant() {
 
     try {
       const spendingData = JSON.stringify(
-        transactions.map((t) => ({ 
-          amount: t.amount, 
-          category: t.categoryId, 
+        transactions.map((t) => ({
+          amount: t.amount,
+          category: t.categoryId,
           description: t.description,
           date: t.date,
           type: t.type
@@ -65,7 +65,7 @@ export default function AIFinancialAssistant() {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-16 right-4 md:bottom-6 md:right-6 z-50">
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -89,11 +89,10 @@ export default function AIFinancialAssistant() {
                   <div className="space-y-4">
                     {messages.map((m, i) => (
                       <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                        <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${
-                          m.role === "user" 
-                            ? "bg-primary text-primary-foreground rounded-tr-none" 
-                            : "bg-muted text-foreground rounded-tl-none border border-border"
-                        }`}>
+                        <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${m.role === "user"
+                          ? "bg-primary text-primary-foreground rounded-tr-none"
+                          : "bg-muted text-foreground rounded-tl-none border border-border"
+                          }`}>
                           {m.content}
                         </div>
                       </div>
@@ -110,9 +109,9 @@ export default function AIFinancialAssistant() {
               </CardContent>
               <CardFooter className="p-3 border-t bg-card/50">
                 <form className="flex w-full gap-2" onSubmit={(e) => { e.preventDefault(); handleSend(); }}>
-                  <Input 
-                    placeholder="Ask about your spending..." 
-                    value={input} 
+                  <Input
+                    placeholder="Ask about your spending..."
+                    value={input}
                     onChange={(e) => setInput(e.target.value)}
                     className="bg-background/50 border-primary/20 focus-visible:ring-primary"
                   />

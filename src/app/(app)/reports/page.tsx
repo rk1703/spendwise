@@ -18,12 +18,13 @@ export default function ReportsPage() {
         description="Visualize your spending patterns and financial health."
         icon={PieChartIcon}
       />
-      
-      <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2 w-full">
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-full overflow-hidden">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
+          className="w-full overflow-hidden"
         >
           <SpendingPieChart />
         </motion.div>
@@ -31,6 +32,7 @@ export default function ReportsPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
+          className="w-full overflow-hidden"
         >
           <SpendingLineChart />
         </motion.div>
@@ -38,7 +40,7 @@ export default function ReportsPage() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="glass-card"
+          className="glass-card w-full overflow-hidden"
         >
           <DataExport />
         </motion.div>
@@ -46,7 +48,7 @@ export default function ReportsPage() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="glass-card"
+          className="glass-card w-full overflow-hidden"
         >
           <MonthlyExport />
         </motion.div>
@@ -55,18 +57,18 @@ export default function ReportsPage() {
       <Card className="mt-8 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="text-primary"/> More Insights Coming Soon
+            <BarChart3 className="text-primary" /> More Insights Coming Soon
           </CardTitle>
           <CardDescription>
             We're working on adding more detailed reports to help you understand your finances better.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col md:flex-row items-center gap-6">
-          <Image 
-            src="/assets/spend_report.png" 
-            alt="Data analysis illustration" 
-            width={300} 
-            height={200} 
+          <Image
+            src="/assets/spend_report.png"
+            alt="Data analysis illustration"
+            width={300}
+            height={200}
             className="rounded-lg shadow-md dark:bg-[#ffe0c2]"
             data-ai-hint="data analysis charts"
           />
@@ -78,7 +80,6 @@ export default function ReportsPage() {
               <li>Income vs. Expense comparisons over various periods.</li>
               <li>Deep dives into specific category spending trends.</li>
               <li>Net worth tracking (if assets/liabilities are added).</li>
-              <li>Exportable PDF reports for your records.</li>
             </ul>
             <p className="mt-4 text-sm">
               Stay tuned for these exciting updates!

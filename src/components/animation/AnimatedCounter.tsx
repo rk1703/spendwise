@@ -24,7 +24,7 @@ export default function AnimatedCounter({
     damping: 30,
     stiffness: 100,
   });
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, { once: true, margin: "-20px" });
 
   useEffect(() => {
     if (isInView) {
@@ -33,7 +33,15 @@ export default function AnimatedCounter({
   }, [motionValue, value, isInView]);
 
   useEffect(() => {
-    springValue.on("change", (latest) => {
+    // Set initial value
+    if (ref.current && !isInView) {
+      ref.current.textContent = `${prefix}${value.toLocaleString(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      })}${suffix}`;
+    }
+
+    const unsubscribe = springValue.on("change", (latest) => {
       if (ref.current) {
         ref.current.textContent = `${prefix}${latest.toLocaleString(undefined, {
           minimumFractionDigits: decimals,
@@ -41,7 +49,8 @@ export default function AnimatedCounter({
         })}${suffix}`;
       }
     });
-  }, [springValue, prefix, suffix, decimals]);
+    return () => unsubscribe();
+  }, [springValue, prefix, suffix, decimals, value, isInView]);
 
-  return <span ref={ref} />;
+  return <span ref={ref} className="tabular-nums" />;
 }

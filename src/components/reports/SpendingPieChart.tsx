@@ -92,7 +92,7 @@ export function SpendingPieChart() {
         <CardDescription>A visual breakdown of your current month expenses.</CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center p-0">
-        <ChartContainer config={chartConfig} className="aspect-square h-[350px]">
+        <ChartContainer config={chartConfig} className="aspect-square w-full max-w-[350px] mx-auto">
           <PieChart>
             <ChartTooltip
               cursor={false}
