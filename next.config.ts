@@ -19,6 +19,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  serverExternalPackages: ['genkit', '@genkit-ai/google-genai', '@genkit-ai/next'],
 };
 
 const config = withPWA({
