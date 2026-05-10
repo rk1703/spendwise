@@ -1,0 +1,79 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Existing per-user data (transactions/categories/budgets)
+    match /users/{userId}/{document=**} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isGroupMember(groupId) {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/splitGroups/$(groupId)/members/$(request.auth.uid));
+    }
+
+    function isGroupOwner(groupId) {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/splitGroups/$(groupId)).data.ownerUid == request.auth.uid;
+    }
+
+    // Allow a user to join by adding only their uid to memberUids (or no-op if already in).
+    function onlyAddingSelfToMemberUids(groupId) {
+      return isSignedIn()
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["memberUids"])
+        && request.auth.uid in request.resource.data.memberUids
+        && (
+          (request.resource.data.memberUids.size() == resource.data.memberUids.size() + 1
+           && request.resource.data.memberUids.hasAll(resource.data.memberUids))
+          || (request.resource.data.memberUids.size() == resource.data.memberUids.size()
+              && request.auth.uid in resource.data.memberUids)
+        );
+    }
+
+    match /splitGroups/{groupId} {
+      // Must use memberUids (not isGroupMember) so queries like
+      // where('memberUids', 'array-contains', uid) are allowed.
+      allow read: if isSignedIn() && request.auth.uid in resource.data.memberUids;
+
+      // Group creation: owner creates a group containing only themselves initially.
+      allow create: if isSignedIn()
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.memberUids.size() == 1
+        && request.resource.data.memberUids[0] == request.auth.uid;
+
+      // Updates:
+      // - owner can update group fields (e.g. name)
+      // - non-members can join only by adding themselves to memberUids
+      allow update: if isGroupOwner(groupId) || onlyAddingSelfToMemberUids(groupId);
+
+      allow delete: if isGroupOwner(groupId);
+
+      match /members/{uid} {
+        allow read: if isGroupMember(groupId);
+        // Joining creates your own membership doc.
+        allow create: if isSignedIn() && uid == request.auth.uid;
+        // Owner can manage members; member can remove themselves (leave).
+        allow delete: if isGroupOwner(groupId) || (isSignedIn() && uid == request.auth.uid);
+        allow update: if isGroupOwner(groupId);
+      }
+
+      match /expenses/{expenseId} {
+        allow read: if isGroupMember(groupId);
+        allow create: if isGroupMember(groupId) && request.resource.data.createdByUid == request.auth.uid;
+        allow update, delete: if isGroupMember(groupId)
+          && (resource.data.createdByUid == request.auth.uid || isGroupOwner(groupId));
+      }
+
+      // Invite docs: readable to any signed-in user who has the link (groupId + inviteId).
+      match /invites/{inviteId} {
+        allow read: if isSignedIn();
+        allow create: if isGroupMember(groupId) && request.resource.data.createdByUid == request.auth.uid;
+        allow update, delete: if isGroupOwner(groupId) || (isGroupMember(groupId) && resource.data.createdByUid == request.auth.uid);
+      }
+    }
+  }
+}
+

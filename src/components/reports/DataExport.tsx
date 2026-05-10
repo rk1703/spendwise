@@ -150,26 +150,27 @@ export function DataExport() {
 
 
   return (
-    <Card className="shadow-lg">
+    <Card className="glass-card overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><Download className="text-primary" />Export Data</CardTitle>
+        <CardTitle className="flex items-center gap-2 font-heading"><Download className="text-primary" />Export Data</CardTitle>
         <CardDescription>Download your financial data for backup or external analysis.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <p className="mb-2 text-sm text-muted-foreground">
-            Export all your transactions, categories, and budgets as a JSON file. This format is suitable for re-importing or programmatic use.
+      <CardContent className="space-y-6">
+        <div className="bg-background/40 p-4 rounded-xl border border-border/50">
+          <p className="mb-3 text-sm text-muted-foreground leading-relaxed">
+            Export all your transactions, categories, and budgets as a professional PDF report.
           </p>
-          <Button onClick={handleExportPDF}>
-            <Download className="mr-2 h-4 w-4" /> Export Transactions (PDF)
+          <Button onClick={handleExportPDF} className="w-full sm:w-auto shadow-md">
+            <Download className="mr-2 h-4 w-4" /> Export as PDF
           </Button>
         </div>
-        <div>
-          <p className="mb-2 text-sm text-muted-foreground">
-            Export only your transactions list as a CSV file. This format is suitable for spreadsheets.
+        <div className="bg-background/40 p-4 rounded-xl border border-border/50">
+          <p className="mb-3 text-sm text-muted-foreground leading-relaxed">
+            Export only your transactions list as a CSV file for spreadsheets like Excel.
           </p>
-          <Button onClick={handleExportCSV} variant="secondary">
-            <Download className="mr-2 h-4 w-4" /> Export Transactions (CSV)
+          <Button onClick={handleExportCSV} variant="secondary" className="w-full sm:w-auto shadow-sm">
+            <Download className="mr-2 h-4 w-4" /> Export as CSV
           </Button>
         </div>
       </CardContent>

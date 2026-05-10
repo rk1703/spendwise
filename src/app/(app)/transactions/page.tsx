@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
+import { motion } from 'framer-motion';
 
 const ALL_CATEGORIES_VALUE = "all_categories_filter_value";
 
@@ -166,18 +167,30 @@ export default function TransactionsPage() {
       </div>
 
       {filteredAndSortedTransactions.length > 0 ? (
-       <div className="space-y-6">
-       {Object.entries(groupedTransactions).map(([month, transactionsInMonth]) => (
-         <div key={month}>
-           <h2 className="text-lg font-semibold text-foreground mb-3 pb-2 border-b">{month}</h2>
-           <div className="space-y-4">
-             {transactionsInMonth.map((t) => (
-               <TransactionItem key={t.id} transaction={t} onEdit={handleEdit} />
-             ))}
-           </div>
-         </div>
-       ))}
-     </div>
+        <div className="space-y-6">
+          {Object.entries(groupedTransactions).map(([month, transactionsInMonth], monthIndex) => (
+            <motion.div
+              key={month}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: monthIndex * 0.1 }}
+            >
+              <h2 className="text-lg font-semibold text-foreground mb-3 pb-2 border-b">{month}</h2>
+              <div className="grid gap-4">
+                {transactionsInMonth.map((t, index) => (
+                  <motion.div
+                    key={t.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: (monthIndex * 0.1) + (index * 0.05) }}
+                  >
+                    <TransactionItem transaction={t} onEdit={handleEdit} />
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
       ) : (
         <div className="text-center py-10 ">
           <Filter className="mx-auto h-12 w-12 text-muted-foreground mb-4" />

@@ -3,7 +3,7 @@
 
 import React, { createContext, useContext, ReactNode, useMemo, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import type { Transaction, Category, Budget } from '@/lib/types';
+import type { Transaction, Category, Budget, SplitGroup, SplitGroupExpense, SplitGroupInvite } from '@/lib/types';
 import { DEFAULT_CATEGORIES } from '@/constants';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase/config';
@@ -11,6 +11,7 @@ import {
   collection,
   doc,
   addDoc,
+  setDoc,
   updateDoc,
   deleteDoc,
   onSnapshot,
@@ -19,6 +20,8 @@ import {
   writeBatch,
   getDocs,
   orderBy,
+  runTransaction,
+  arrayUnion,
 } from 'firebase/firestore';
 import { toast } from 'sonner';
 
@@ -44,6 +47,16 @@ interface AppContextType {
   updateBudget: (budget: Budget) => Promise<void>;
   deleteBudget: (id: string) => Promise<void>;
   getBudgetByCategoryId: (categoryId: string) => Budget | undefined;
+
+  // Split Money (real multi-user groups)
+  splitGroups: SplitGroup[];
+  loadingSplitGroups: boolean;
+  createSplitGroup: (name: string) => Promise<void>;
+  deleteSplitGroup: (groupId: string) => Promise<void>;
+  createSplitInvite: (groupId: string) => Promise<{ inviteId: string; inviteUrl: string } | null>;
+  acceptSplitInvite: (groupId: string, inviteId: string) => Promise<void>;
+  addSplitGroupExpense: (groupId: string, expense: Omit<SplitGroupExpense, 'id' | 'createdAt' | 'createdByUid'>) => Promise<void>;
+  deleteSplitGroupExpense: (groupId: string, expenseId: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -59,12 +72,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingBudgets, setLoadingBudgets] = useState(true);
 
+  const [splitGroups, setSplitGroups] = useState<SplitGroup[]>([]);
+  const [loadingSplitGroups, setLoadingSplitGroups] = useState(true);
+
   // Firestore Listeners
   useEffect(() => {
     if (user?.uid) {
       setLoadingTransactions(true);
       setLoadingCategories(true);
       setLoadingBudgets(true);
+      setLoadingSplitGroups(true);
 
       // Categories listener & default seeding/syncing
       const categoriesColRef = collection(db, 'users', user.uid, 'categories');
@@ -157,10 +174,34 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         setLoadingBudgets(false);
       });
 
+      // Split Groups listener
+      const splitGroupsColRef = collection(db, 'splitGroups');
+      // NOTE: Avoid `orderBy` here to prevent requiring a composite index
+      // (array-contains + orderBy on different field).
+      const splitGroupsQuery = query(splitGroupsColRef, where('memberUids', 'array-contains', user.uid));
+      const unsubscribeSplitGroups = onSnapshot(splitGroupsQuery, (snapshot) => {
+        const groups = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as SplitGroup));
+        groups.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setSplitGroups(groups);
+        setLoadingSplitGroups(false);
+      }, (error) => {
+        console.error("Error fetching split groups: ", error);
+        const code = (error as any)?.code as string | undefined;
+        if (code === "permission-denied") {
+          toast.error("Permissions Error", { description: "Could not load split groups. Publish the updated Firestore rules." });
+        } else if (code === "failed-precondition") {
+          toast.error("Index Required", { description: "Could not load split groups. Your Firestore query needs an index (or keep orderBy removed)." });
+        } else {
+          toast.error("Error", { description: "Could not load split groups." });
+        }
+        setLoadingSplitGroups(false);
+      });
+
       return () => {
         unsubscribeCategories();
         unsubscribeTransactions();
         unsubscribeBudgets();
+        unsubscribeSplitGroups();
       };
     } else {
       setTransactions([]);
@@ -169,6 +210,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setLoadingTransactions(false);
       setLoadingCategories(false);
       setLoadingBudgets(false);
+      setSplitGroups([]);
+      setLoadingSplitGroups(false);
     }
   }, [user?.uid, toast]);
 
@@ -332,14 +375,174 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
 
   const getBudgetByCategoryId = (categoryId: string) => budgets.find(b => b.categoryId === categoryId);
 
+  const createSplitGroup = async (name: string) => {
+    if (!user?.uid) return;
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    if (splitGroups.some(g => g.name.toLowerCase() === trimmed.toLowerCase())) {
+      toast.error("Group Exists", { description: `A group named "${trimmed}" already exists.` });
+      return;
+    }
+    try {
+      const nowIso = new Date().toISOString();
+      const groupRef = doc(collection(db, 'splitGroups'));
+      const batch = writeBatch(db);
+      batch.set(groupRef, {
+        name: trimmed,
+        ownerUid: user.uid,
+        memberUids: [user.uid],
+        createdAt: nowIso,
+      });
+      batch.set(doc(db, 'splitGroups', groupRef.id, 'members', user.uid), {
+        uid: user.uid,
+        displayName: user.displayName || undefined,
+        email: user.email || undefined,
+        role: "owner",
+        joinedAt: nowIso,
+      });
+      await batch.commit();
+      toast.success("Group Created", { description: `Created "${trimmed}".` });
+    } catch (error) {
+      console.error("Error adding split group: ", error);
+      toast.error("Error", { description: "Could not create split group." });
+    }
+  };
+
+  const deleteSplitGroup = async (groupId: string) => {
+    if (!user?.uid) return;
+    try {
+      const membersSnap = await getDocs(collection(db, 'splitGroups', groupId, 'members'));
+      const expensesSnap = await getDocs(collection(db, 'splitGroups', groupId, 'expenses'));
+      const invitesSnap = await getDocs(collection(db, 'splitGroups', groupId, 'invites'));
+
+      const docsToDelete = [...membersSnap.docs, ...expensesSnap.docs, ...invitesSnap.docs];
+      for (let i = 0; i < docsToDelete.length; i += 450) {
+        const batch = writeBatch(db);
+        docsToDelete.slice(i, i + 450).forEach(d => batch.delete(d.ref));
+        await batch.commit();
+      }
+
+      await deleteDoc(doc(db, 'splitGroups', groupId));
+      toast.success("Group Deleted", { description: "Group and its data have been removed." });
+    } catch (error) {
+      console.error("Error deleting split group: ", error);
+      toast.error("Error", { description: "Could not delete split group." });
+    }
+  };
+
+  const createSplitInvite = async (groupId: string): Promise<{ inviteId: string; inviteUrl: string } | null> => {
+    if (!user?.uid) return null;
+    try {
+      const inviteId =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : uuidv4();
+      const now = new Date();
+      const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+      const invite: Omit<SplitGroupInvite, 'id'> = {
+        createdAt: now.toISOString(),
+        createdByUid: user.uid,
+        expiresAt: expiresAt.toISOString(),
+        revoked: false,
+      };
+
+      await setDoc(doc(db, 'splitGroups', groupId, 'invites', inviteId), invite);
+
+      const inviteUrl =
+        typeof window !== 'undefined'
+          ? `${window.location.origin}/split/join?g=${encodeURIComponent(groupId)}&i=${encodeURIComponent(inviteId)}`
+          : `/split/join?g=${encodeURIComponent(groupId)}&i=${encodeURIComponent(inviteId)}`;
+
+      toast.success("Invite Link Created", { description: "Share the link to invite others." });
+      return { inviteId, inviteUrl };
+    } catch (error) {
+      console.error("Error creating split invite: ", error);
+      toast.error("Error", { description: "Could not create invite link." });
+      return null;
+    }
+  };
+
+  const acceptSplitInvite = async (groupId: string, inviteId: string) => {
+    if (!user?.uid) return;
+    try {
+      await runTransaction(db, async (tx) => {
+        const groupRef = doc(db, 'splitGroups', groupId);
+        const inviteRef = doc(db, 'splitGroups', groupId, 'invites', inviteId);
+        const memberRef = doc(db, 'splitGroups', groupId, 'members', user.uid);
+
+        // Do NOT read the group doc (not-yet-member has no read permission).
+        // Do NOT read the member doc (not-yet-member has no read on members subcollection).
+        const inviteSnap = await tx.get(inviteRef);
+        if (!inviteSnap.exists()) throw new Error("Invite not found.");
+
+        const inviteData = inviteSnap.data() as Omit<SplitGroupInvite, 'id'>;
+        if (inviteData.revoked) throw new Error("Invite revoked.");
+        if (new Date(inviteData.expiresAt).getTime() < Date.now()) throw new Error("Invite expired.");
+
+        // Create our membership doc (allowed: uid == request.auth.uid).
+        tx.set(memberRef, {
+          uid: user.uid,
+          displayName: user.displayName || undefined,
+          email: user.email || undefined,
+          role: "member",
+          joinedAt: new Date().toISOString(),
+        });
+        // Add ourselves to group's memberUids (allowed: onlyAddingSelfToMemberUids).
+        tx.update(groupRef, { memberUids: arrayUnion(user.uid) });
+      });
+      toast.success("Joined Group", { description: "You're now a member of this split group." });
+    } catch (error) {
+      console.error("Error accepting split invite: ", error);
+      toast.error("Invite Failed", { description: (error as Error)?.message || "Could not join group." });
+    }
+  };
+
+  const addSplitGroupExpense = async (
+    groupId: string,
+    expense: Omit<SplitGroupExpense, 'id' | 'createdAt' | 'createdByUid'>
+  ) => {
+    if (!user?.uid) return;
+    try {
+      await addDoc(collection(db, 'splitGroups', groupId, 'expenses'), {
+        ...expense,
+        createdAt: new Date().toISOString(),
+        createdByUid: user.uid,
+      });
+      toast.success("Expense Added", { description: `Added "${expense.description}".` });
+    } catch (error) {
+      console.error("Error adding split expense: ", error);
+      toast.error("Error", { description: "Could not add expense." });
+    }
+  };
+
+  const deleteSplitGroupExpense = async (groupId: string, expenseId: string) => {
+    if (!user?.uid) return;
+    try {
+      await deleteDoc(doc(db, 'splitGroups', groupId, 'expenses', expenseId));
+      toast.success("Expense Deleted", { description: "Expense removed." });
+    } catch (error) {
+      console.error("Error deleting split expense: ", error);
+      toast.error("Error", { description: "Could not delete expense." });
+    }
+  };
+
   const contextValue = useMemo(() => ({
     transactions, loadingTransactions, addTransaction, updateTransaction, deleteTransaction, getTransactionsByCategory,
     categories: categoriesData, loadingCategories, addCategory, updateCategory, deleteCategory, getCategoryById, getCategoryByName,
     budgets, loadingBudgets, addBudget, updateBudget, deleteBudget, getBudgetByCategoryId,
+    splitGroups,
+    loadingSplitGroups,
+    createSplitGroup,
+    deleteSplitGroup,
+    createSplitInvite,
+    acceptSplitInvite,
+    addSplitGroupExpense,
+    deleteSplitGroupExpense,
   }), [
     transactions, loadingTransactions, 
     categoriesData, loadingCategories, 
     budgets, loadingBudgets,
+    splitGroups,
+    loadingSplitGroups,
     user?.uid // Re-memoize if user changes, to re-bind functions with correct uid scope
   ]);
 

@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Edit3, Trash2, Tag, Palette, Loader2 } from 'lucide-react';
+import { PlusCircle, Edit3, Trash2, Tag, Palette, Loader2, type LucideIcon } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -63,14 +63,15 @@ const CategoryForm = ({ category, onSave, onCancel }: { category?: Category, onS
   });
 
   // Dynamically get the component for the preview
-  const SelectedIconPreview = LucideIcons[selectedIconName as keyof typeof LucideIcons] || Tag;
+  const iconMap = LucideIcons as unknown as Record<string, LucideIcon>;
+  const SelectedIconPreview = iconMap[selectedIconName] || Tag;
 
   const onSubmit = (data: CategoryFormData) => {
     // data.icon is already the string name. This is what we want to save.
     const categoryData = { ...data };
 
     if (categories.some(c => c.name.toLowerCase() === data.name.toLowerCase() && c.id !== category?.id)) {
-        setValue('name', data.name, { shouldSetTouched: true }); // Ensure an error object exists for name
+        setValue('name', data.name, { shouldTouch: true }); // Ensure an error object exists for name
         errors.name = { type: 'manual', message: 'Category name already exists.' };
         return; // Stop submission
     }
@@ -87,8 +88,6 @@ const CategoryForm = ({ category, onSave, onCancel }: { category?: Category, onS
     setSelectedIconName(iconName);
     setValue('icon', iconName, { shouldValidate: true });
   }
-
-  console.log(iconKeys);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -114,7 +113,7 @@ const CategoryForm = ({ category, onSave, onCancel }: { category?: Category, onS
                 <ScrollArea className="h-[200px]">
                     <div className="p-2 grid grid-cols-5 gap-1">
                     {iconKeys.map(iconKey => {
-                        const Icon = LucideIcons[iconKey];
+                        const Icon = iconMap[iconKey as string] || Tag;
                         return (
                         <Button
                             key={iconKey}
@@ -205,7 +204,8 @@ export function CategoryManager() {
           <ul className="space-y-3">
             {categories.map((cat) => {
               // Look up the icon component from its string name
-              const IconComponent = LucideIcons[cat.icon as keyof typeof LucideIcons] || Tag;
+              const iconMap = LucideIcons as unknown as Record<string, LucideIcon>;
+              const IconComponent = iconMap[cat.icon] || Tag;
               return (
                 <li key={cat.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-md hover:bg-muted/60 transition-colors">
                   <div className="flex items-center gap-3">

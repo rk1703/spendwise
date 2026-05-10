@@ -4,9 +4,11 @@ import { PageHeader } from '@/components/PageHeader';
 import { SpendingPieChart } from '@/components/reports/SpendingPieChart';
 import { SpendingLineChart } from '@/components/reports/SpendingLineChart';
 import { DataExport } from '@/components/reports/DataExport';
+import { MonthlyExport } from '@/components/reports/MonthlyExport';
 import { PieChartIcon, BarChart3 } from 'lucide-react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { motion } from 'framer-motion';
 
 export default function ReportsPage() {
   return (
@@ -18,9 +20,36 @@ export default function ReportsPage() {
       />
       
       <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2 w-full">
-        <SpendingPieChart />
-        <SpendingLineChart />
-        <DataExport />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <SpendingPieChart />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <SpendingLineChart />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="glass-card"
+        >
+          <DataExport />
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="glass-card"
+        >
+          <MonthlyExport />
+        </motion.div>
       </div>
 
       <Card className="mt-8 shadow-lg">

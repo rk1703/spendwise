@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Libre Baskerville', serif;
+  font-family: var(--font-inter), sans-serif;
 }
 
 @layer base {
@@ -40,10 +40,7 @@ body {
     --sidebar-accent-foreground: 0 0% 20.3922%;
     --sidebar-border: 0 0% 92.1569%;
     --sidebar-ring: 0 0% 70.9804%;
-    --font-sans: 'Libre Baskerville', serif;
-    --font-serif: 'Libre Baskerville', serif; /* Ensuring serif also points to Libre Baskerville for consistency */
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
@@ -87,10 +84,7 @@ body {
     --sidebar-accent-foreground: 240 4.7619% 95.8824%;
     --sidebar-border: 240 3.7037% 15.8824%;
     --sidebar-ring: 240 4.8780% 83.9216%;
-    --font-sans: 'Libre Baskerville', serif;
-    --font-serif: 'Libre Baskerville', serif; /* Ensuring serif also points to Libre Baskerville for consistency */
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
@@ -116,9 +110,19 @@ body {
       .no-scrollbar::-webkit-scrollbar {
           display: none;
       }
-     /* Hide scrollbar for IE, Edge and Firefox */
+      /* Hide scrollbar for IE, Edge and Firefox */
       .no-scrollbar {
           -ms-overflow-style: none;  /* IE and Edge */
           scrollbar-width: none;  /* Firefox */
-    }
-  }
+      }
+      
+      .glass {
+        @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
+      }
+      .glass-dark {
+        @apply bg-black/50 backdrop-blur-lg border border-white/10 shadow-2xl;
+      }
+      .glass-card {
+        @apply bg-card/60 backdrop-blur-md border border-border/50 shadow-lg hover:shadow-xl transition-all duration-300;
+      }
+}

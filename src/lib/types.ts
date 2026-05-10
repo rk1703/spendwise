@@ -31,3 +31,45 @@ export interface ChartDataPoint {
   value: number;
   fill?: string;
 }
+
+// --- Split Money (real multi-user groups) ---
+export type SplitGroupRole = "owner" | "member";
+
+export interface SplitGroup {
+  id: string;
+  name: string;
+  ownerUid: string;
+  memberUids: string[]; // for quick "where array-contains uid" queries
+  createdAt: string; // ISO string date
+}
+
+// Stored at `splitGroups/{groupId}/members/{uid}`
+export interface SplitGroupMember {
+  id: string; // same as uid (document id)
+  uid: string;
+  displayName?: string;
+  email?: string;
+  role: SplitGroupRole;
+  joinedAt: string; // ISO string date
+}
+
+// Stored at `splitGroups/{groupId}/expenses/{expenseId}`
+export interface SplitGroupExpense {
+  id: string;
+  description: string;
+  amount: number;
+  date: string; // ISO string date
+  paidByUid: string;
+  splitBetweenUids: string[];
+  createdAt: string; // ISO string date
+  createdByUid: string;
+}
+
+// Stored at `splitGroups/{groupId}/invites/{inviteId}`
+export interface SplitGroupInvite {
+  id: string;
+  createdAt: string; // ISO string date
+  createdByUid: string;
+  expiresAt: string; // ISO string date
+  revoked: boolean;
+}

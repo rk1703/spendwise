@@ -10,9 +10,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['Libre Baskerville', 'serif'],
-        headline: ['Libre Baskerville', 'serif'],
-        code: ['monospace'],
+        sans: ['var(--font-inter)', 'sans-serif'],
+        heading: ['var(--font-outfit)', 'sans-serif'],
+        mono: ['var(--font-mono)', 'monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',

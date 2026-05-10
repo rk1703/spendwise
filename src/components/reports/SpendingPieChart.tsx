@@ -85,9 +85,10 @@ export function SpendingPieChart() {
 
 
   return (
-    <Card className="shadow-lg">
+    <Card className="glass-card overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
       <CardHeader>
-        <CardTitle>Monthly Spending by Category</CardTitle>
+        <CardTitle className="font-heading">Monthly Spending by Category</CardTitle>
         <CardDescription>A visual breakdown of your current month expenses.</CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center p-0">
@@ -101,25 +102,31 @@ export function SpendingPieChart() {
               data={data}
               dataKey="value"
               nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={120}
-              labelLine={false}
+              innerRadius={60}
+              outerRadius={100}
+              paddingAngle={5}
+              stroke="none"
+              animationBegin={0}
+              animationDuration={1500}
               label={({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
-                 if (percent < 0.05) return null; // Hide label for small slices
+                 if (percent < 0.05) return null;
                  const RADIAN = Math.PI / 180;
-                 const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                 const radius = outerRadius + 15;
                  const x = cx + radius * Math.cos(-midAngle * RADIAN);
                  const y = cy + radius * Math.sin(-midAngle * RADIAN);
                  return (
-                    <text x={x} y={y} fill="hsl(var(--card-foreground))" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs">
+                    <text x={x} y={y} fill="currentColor" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-[10px] font-medium opacity-70">
                         {`${(percent * 100).toFixed(0)}%`}
                     </text>
                 );
               }}
             >
               {data.map((entry) => (
-                <Cell key={`cell-${entry.name}`} fill={entry.fill} />
+                <Cell 
+                  key={`cell-${entry.name}`} 
+                  fill={entry.fill} 
+                  className="hover:opacity-80 transition-opacity cursor-pointer outline-none"
+                />
               ))}
             </Pie>
             <ChartLegend

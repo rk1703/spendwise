@@ -5,12 +5,13 @@ import { PageHeader } from '@/components/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAppContext } from '@/context/AppContext';
 import type { Transaction } from '@/lib/types';
-import { IndianRupee, TrendingUp, TrendingDown, ListChecks, Target, LayoutDashboard, Tag, FileWarning, Loader2 } from 'lucide-react';
+import { IndianRupee, TrendingUp, TrendingDown, ListChecks, Target, LayoutDashboard, Tag, FileWarning, Loader2, type LucideIcon } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Progress } from "@/components/ui/progress";
+import AIInsightCard from '@/components/ai/AIInsightCard';
 import {
   ChartConfig,
   ChartContainer,
@@ -19,7 +20,9 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart"
-import { Bar, BarChart, Pie, PieChart, Cell, XAxis, YAxis } from "recharts"
+import { motion } from "framer-motion";
+import AnimatedCounter from "@/components/animation/AnimatedCounter";
+import { Bar, BarChart, Pie, PieChart, Cell, XAxis, YAxis, ResponsiveContainer } from "recharts"
 
 export default function DashboardPage() {
   const {
@@ -32,6 +35,8 @@ export default function DashboardPage() {
     loadingCategories,
     loadingBudgets
   } = useAppContext();
+
+  const iconMap = LucideIcons as unknown as Record<string, LucideIcon>;
 
   // --- All-Time Totals for Balance ---
   const totalIncomeAllTime = transactions
@@ -109,129 +114,189 @@ export default function DashboardPage() {
     <>
       <PageHeader title="Dashboard" description="Your financial overview at a glance." icon={LayoutDashboard} />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
-            <IndianRupee className="h-5 w-5 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            {loadingTransactions ? <Loader2 className="h-7 w-7 animate-spin text-primary" /> : <div className="text-3xl font-bold font-headline">₹{balance.toFixed(2)}</div>}
-            <p className="text-xs text-muted-foreground">Available funds from all transactions</p>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
+          <Card className="glass-card overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
+              <IndianRupee className="h-5 w-5 text-primary" />
+            </CardHeader>
+            <CardContent>
+              {loadingTransactions ? (
+                <Loader2 className="h-7 w-7 animate-spin text-primary" />
+              ) : (
+                <div className="text-3xl font-bold font-heading">
+                  ₹<AnimatedCounter value={balance} decimals={2} />
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">Available funds from all transactions</p>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month's Income</CardTitle>
-            <TrendingUp className="h-5 w-5 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            {loadingTransactions ? <Loader2 className="h-7 w-7 animate-spin text-green-500" /> : <div className="text-3xl font-bold font-headline text-green-600">₹{totalMonthlyIncome.toFixed(2)}</div>}
-            <p className="text-xs text-muted-foreground">Earned this calendar month</p>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <Card className="glass-card overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-transparent pointer-events-none" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">This Month's Income</CardTitle>
+              <TrendingUp className="h-5 w-5 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              {loadingTransactions ? (
+                <Loader2 className="h-7 w-7 animate-spin text-green-500" />
+              ) : (
+                <div className="text-3xl font-bold font-heading text-green-600 dark:text-green-400">
+                  ₹<AnimatedCounter value={totalMonthlyIncome} decimals={2} />
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">Earned this calendar month</p>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">This Month's Expenses</CardTitle>
-            <TrendingDown className="h-5 w-5 text-red-500" />
-          </CardHeader>
-          <CardContent>
-            {loadingTransactions ? <Loader2 className="h-7 w-7 animate-spin text-red-500" /> : <div className="text-3xl font-bold font-headline text-red-600">₹{totalMonthlyExpenses.toFixed(2)}</div>}
-            <p className="text-xs text-muted-foreground">Spent this calendar month</p>
-          </CardContent>
-        </Card>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <Card className="glass-card overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 to-transparent pointer-events-none" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">This Month's Expenses</CardTitle>
+              <TrendingDown className="h-5 w-5 text-red-500" />
+            </CardHeader>
+            <CardContent>
+              {loadingTransactions ? (
+                <Loader2 className="h-7 w-7 animate-spin text-red-500" />
+              ) : (
+                <div className="text-3xl font-bold font-heading text-red-600 dark:text-red-400">
+                  ₹<AnimatedCounter value={totalMonthlyExpenses} decimals={2} />
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1">Spent this calendar month</p>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       <div className="grid gap-6 mt-6 md:grid-cols-2">
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><ListChecks className="text-primary" />Recent Transactions</CardTitle>
-            <CardDescription>Your last 5 transactions.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loadingTransactions || loadingCategories ? (
-              <div className="flex justify-center items-center h-[150px]">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : recentTransactions.length > 0 ? (
-              <ul className="space-y-3">
-                {recentTransactions.map((t) => {
-                  const category = getCategoryById(t.categoryId);
-                  const Icon = category ? (LucideIcons[category.icon as keyof typeof LucideIcons] || Tag) : Tag;
-                  return (
-                    <li key={t.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <Icon className="h-5 w-5 text-muted-foreground" style={{ color: category?.color }} />
-                        <div>
-                          <p className="font-medium">{t.description}</p>
-                          <p className="text-xs text-muted-foreground">{new Date(t.date).toLocaleDateString()} - {category?.name || 'Uncategorized'}</p>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="md:col-span-2"
+        >
+          <AIInsightCard />
+        </motion.div>
+        
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><ListChecks className="text-primary" />Recent Transactions</CardTitle>
+              <CardDescription>Your last 5 transactions.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loadingTransactions || loadingCategories ? (
+                <div className="flex justify-center items-center h-[150px]">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : recentTransactions.length > 0 ? (
+                <ul className="space-y-3">
+                  {recentTransactions.map((t) => {
+                    const category = getCategoryById(t.categoryId);
+                    const Icon = category ? (iconMap[category.icon] || Tag) : Tag;
+                    return (
+                      <li key={t.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <Icon className="h-5 w-5 text-muted-foreground" style={{ color: category?.color }} />
+                          <div>
+                            <p className="font-medium">{t.description}</p>
+                            <p className="text-xs text-muted-foreground">{new Date(t.date).toLocaleDateString()} - {category?.name || 'Uncategorized'}</p>
+                          </div>
                         </div>
-                      </div>
-                      <span className={`font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                        {t.type === 'income' ? '+' : '-'}₹{t.amount.toFixed(2)}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground text-center py-4">No recent transactions. <Link href="/transactions" className="text-primary hover:underline">Add one!</Link></p>
-            )}
-            <Button asChild variant="link" className="mt-4 w-full">
-              <Link href="/transactions">View All Transactions</Link>
-            </Button>
-          </CardContent>
-        </Card>
+                        <span className={`font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                          {t.type === 'income' ? '+' : '-'}₹{t.amount.toFixed(2)}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="text-muted-foreground text-center py-4">No recent transactions. <Link href="/transactions" className="text-primary hover:underline">Add one!</Link></p>
+              )}
+              <Button asChild variant="link" className="mt-4 w-full">
+                <Link href="/transactions">View All Transactions</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Target className="text-primary" />Budget Goals</CardTitle>
-            <CardDescription>Track your spending against your budgets.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loadingBudgets || loadingCategories || loadingTransactions ? (
-              <div className="flex justify-center items-center h-[150px]">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : budgets.length > 0 ? (
-              <ul className="space-y-4">
-                {budgets.slice(0, 3).map(budget => {
-                  const category = getCategoryById(budget.categoryId);
-                  if (!category) return null;
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <Card className="glass-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2"><Target className="text-primary" />Budget Goals</CardTitle>
+              <CardDescription>Track your spending against your budgets.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {loadingBudgets || loadingCategories || loadingTransactions ? (
+                <div className="flex justify-center items-center h-[150px]">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : budgets.length > 0 ? (
+                <ul className="space-y-4">
+                  {budgets.slice(0, 3).map(budget => {
+                    const category = getCategoryById(budget.categoryId);
+                    if (!category) return null;
 
-                  const now = new Date();
-                  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                  const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                    const now = new Date();
+                    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-                  const spent = getTransactionsByCategory(budget.categoryId)
-                    .filter(t => {
-                      const transactionDate = new Date(t.date);
-                      return t.type === 'expense' && transactionDate >= startOfMonth && transactionDate <= endOfMonth;
-                    })
-                    .reduce((sum, t) => sum + t.amount, 0);
-                  const progress = budget.amount > 0 ? Math.min((spent / budget.amount) * 100, 100) : 0;
-                  const Icon = LucideIcons[category.icon as keyof typeof LucideIcons] || Tag;
-                  return (
-                    <li key={budget.id}>
-                      <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm font-medium flex items-center gap-2"><Icon className="h-4 w-4 text-muted-foreground" style={{ color: category.color }} />{category.name}</span>
-                        <span className="text-sm text-muted-foreground">₹{spent.toFixed(2)} / ₹{budget.amount.toFixed(2)}</span>
-                      </div>
-                      <Progress value={progress} className="h-2 [&>div]:bg-accent" />
-                      {progress >= 100 && <p className="text-xs text-red-500 mt-1">Budget exceeded!</p>}
-                    </li>
-                  )
-                })}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground text-center py-4">No budgets set. <Link href="/budgets" className="text-primary hover:underline">Create one!</Link></p>
-            )}
-            <Button asChild variant="link" className="mt-4 w-full">
-              <Link href="/budgets">Manage Budgets</Link>
-            </Button>
-          </CardContent>
-        </Card>
+                    const spent = getTransactionsByCategory(budget.categoryId)
+                      .filter(t => {
+                        const transactionDate = new Date(t.date);
+                        return t.type === 'expense' && transactionDate >= startOfMonth && transactionDate <= endOfMonth;
+                      })
+                      .reduce((sum, t) => sum + t.amount, 0);
+                    const progress = budget.amount > 0 ? Math.min((spent / budget.amount) * 100, 100) : 0;
+                    const Icon = iconMap[category.icon] || Tag;
+                    return (
+                      <li key={budget.id}>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-sm font-medium flex items-center gap-2"><Icon className="h-4 w-4 text-muted-foreground" style={{ color: category.color }} />{category.name}</span>
+                          <span className="text-sm text-muted-foreground">₹{spent.toFixed(2)} / ₹{budget.amount.toFixed(2)}</span>
+                        </div>
+                        <Progress value={progress} className="h-2 [&>div]:bg-primary" />
+                        {progress >= 100 && <p className="text-xs text-red-500 mt-1">Budget exceeded!</p>}
+                      </li>
+                    )
+                  })}
+                </ul>
+              ) : (
+                <p className="text-muted-foreground text-center py-4">No budgets set. <Link href="/budgets" className="text-primary hover:underline">Create one!</Link></p>
+              )}
+              <Button asChild variant="link" className="mt-4 w-full">
+                <Link href="/budgets">Manage Budgets</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       <div className="grid gap-6 mt-6 md:grid-cols-2">

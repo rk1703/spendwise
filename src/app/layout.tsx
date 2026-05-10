@@ -1,15 +1,23 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { Inter, Outfit } from "next/font/google";
 import { Toaster } from "sonner";
 import { AppProvider } from '@/context/AppContext';
+import { ThemeColorUpdater } from '@/components/ThemeColorUpdater';
+import AIFinancialAssistant from '@/components/ai/AIFinancialAssistant';
 import { AuthProvider } from '@/context/AuthContext'; // Import AuthProvider
 import { ThemeProvider } from 'next-themes';
 import { APP_NAME } from '@/constants';
 import SplashScreenWrapper from '@/components/animation/SplashScreen';
-import { Inter } from "next/font/google";
-import { ThemeColorUpdater } from '@/components/ThemeColorUpdater';
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
-const inter = Inter({ subsets: ["latin"] });
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+});
 
 export const metadata: Metadata = {
   title: "SpendWise",
@@ -44,7 +52,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet"/>
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${outfit.variable} font-sans antialiased`}>
         <ThemeColorUpdater />
         <ThemeProvider
           attribute="class"
@@ -55,6 +63,7 @@ export default function RootLayout({
           <AuthProvider> {/* Wrap AppProvider with AuthProvider */}
             <AppProvider>
               {children}
+              <AIFinancialAssistant />
               <Toaster position="top-right" richColors/>
             </AppProvider>
           </AuthProvider>

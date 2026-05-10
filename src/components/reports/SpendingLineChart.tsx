@@ -62,9 +62,10 @@ export function SpendingLineChart() {
   }
 
   return (
-    <Card className="shadow-lg overflow-x-scroll no-scrollbar">
+    <Card className="glass-card overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
       <CardHeader>
-        <CardTitle>Spending Over Time</CardTitle>
+        <CardTitle className="font-heading">Spending Over Time</CardTitle>
         <CardDescription>Track your expense trends monthly.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -72,35 +73,47 @@ export function SpendingLineChart() {
             <LineChart
               accessibilityLayer
               data={data}
-              margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
+              margin={{ top: 20, right: 20, left: -10, bottom: 5 }}
             >
-              <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <defs>
+                <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="var(--color-expenses)" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="var(--color-expenses)" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.1} />
               <XAxis
                 dataKey="name"
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
+                tickMargin={12}
+                fontSize={12}
                 tickFormatter={(value) => value.slice(0, 3)}
               />
               <YAxis
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
+                tickMargin={12}
+                fontSize={12}
                 tickFormatter={(value) => `₹${value}`}
               />
-              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+              <ChartTooltip cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1 }} content={<ChartTooltipContent hideLabel />} />
               <Line
                 dataKey="expenses"
-                type="monotone"
+                type="natural"
                 stroke="var(--color-expenses)"
-                strokeWidth={2}
+                strokeWidth={3}
                 dot={{
                   fill: "var(--color-expenses)",
+                  stroke: "hsl(var(--background))",
+                  strokeWidth: 2,
                   r: 4,
                 }}
                 activeDot={{
                   r: 6,
+                  strokeWidth: 0
                 }}
+                animationDuration={2000}
               />
             </LineChart>
         </ChartContainer>

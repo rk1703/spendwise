@@ -16,6 +16,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from '@/components/ui/dialog';
+import { motion } from 'framer-motion';
 
 export default function BudgetsPage() {
   const { budgets } = useAppContext();
@@ -64,8 +65,15 @@ export default function BudgetsPage() {
 
       {budgets.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {budgets.map((budget) => (
-            <BudgetItem key={budget.id} budget={budget} onEdit={handleEdit} />
+          {budgets.map((budget, index) => (
+            <motion.div
+              key={budget.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+            >
+              <BudgetItem budget={budget} onEdit={handleEdit} />
+            </motion.div>
           ))}
         </div>
       ) : (

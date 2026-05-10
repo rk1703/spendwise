@@ -5,6 +5,7 @@ import {
   ArrowLeftRight,
   Target,
   PieChartIcon,
+  Users,
   SettingsIcon,
 } from 'lucide-react';
 
@@ -42,5 +43,6 @@ export const navItems: NavItem[] = [
   { href: '/budgets', label: 'Budgets', icon: Target },
   { href: '/transactions', label: 'Transactions', icon: ArrowLeftRight },
   { href: '/reports', label: 'Reports', icon: PieChartIcon },
+  { href: '/split', label: 'Split', icon: Users },
   { href: '/settings', label: 'Settings', icon: SettingsIcon },
 ];

@@ -17,6 +17,7 @@ import { SidebarNav } from '@/components/layout/SidebarNav';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { APP_NAME } from '@/constants';
 import { BottomNavBar } from '@/components/layout/BottomNavBar';
+import PageTransition from '@/components/animation/PageTransition';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loadingAuth } = useAuth();
@@ -66,7 +67,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <SidebarInset>
         <AppHeader />
         <main className="flex-1 p-4 pb-20 md:p-6 lg:p-8 overflow-auto w-screen md:w-full">
-          {children}
+          <PageTransition>
+            {children}
+          </PageTransition>
         </main>
         <BottomNavBar />
       </SidebarInset>
