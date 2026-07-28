@@ -5,6 +5,7 @@ import { SpendingPieChart } from '@/components/reports/SpendingPieChart';
 import { SpendingLineChart } from '@/components/reports/SpendingLineChart';
 import { DataExport } from '@/components/reports/DataExport';
 import { MonthlyExport } from '@/components/reports/MonthlyExport';
+import { FinancialCalendar } from '@/components/reports/FinancialCalendar';
 import { PieChartIcon, BarChart3 } from 'lucide-react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -18,6 +19,14 @@ export default function ReportsPage() {
         description="Visualize your spending patterns and financial health."
         icon={PieChartIcon}
       />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="mt-6 mb-6 w-full overflow-hidden"
+      >
+        <FinancialCalendar />
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-full overflow-hidden">
         <motion.div

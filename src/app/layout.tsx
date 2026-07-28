@@ -9,6 +9,8 @@ import { AuthProvider } from '@/context/AuthContext'; // Import AuthProvider
 import { ThemeProvider } from 'next-themes';
 import { APP_NAME } from '@/constants';
 import SplashScreenWrapper from '@/components/animation/SplashScreen';
+import { ThemeContextProvider } from '@/context/ThemeContext';
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -59,15 +61,18 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        ><SplashScreenWrapper>
-          <AuthProvider> {/* Wrap AppProvider with AuthProvider */}
-            <AppProvider>
-              {children}
-              <AIFinancialAssistant />
-              <Toaster position="top-right" richColors/>
-            </AppProvider>
-          </AuthProvider>
-        </SplashScreenWrapper>
+        >
+          <ThemeContextProvider>
+            <SplashScreenWrapper>
+              <AuthProvider> {/* Wrap AppProvider with AuthProvider */}
+                <AppProvider>
+                  {children}
+                  <AIFinancialAssistant />
+                  <Toaster position="top-right" richColors/>
+                </AppProvider>
+              </AuthProvider>
+            </SplashScreenWrapper>
+          </ThemeContextProvider>
         </ThemeProvider>
       </body>
     </html>
