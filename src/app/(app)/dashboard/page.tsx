@@ -196,7 +196,7 @@ export default function DashboardPage() {
         >
           <AIInsightCard />
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -358,7 +358,7 @@ export default function DashboardPage() {
               </div>
             ) : spendingOverTimeData.length > 1 ? (
               <ChartContainer config={{ total: { label: "Total Spending", color: "hsl(var(--primary))" } }} className="aspect-video max-h-[300px]">
-                <BarChart accessibilityLayer data={spendingOverTimeData} margin={{ top: 5, right: 20, left: -20, bottom: 5 }}>
+                <BarChart accessibilityLayer data={spendingOverTimeData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                   <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
                   <YAxis tickLine={false} axisLine={false} tickMargin={8} fontSize={12} tickFormatter={(value) => `₹${value}`} />
                   <ChartTooltip content={<ChartTooltipContent hideLabel />} cursor={false} />

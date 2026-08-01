@@ -63,6 +63,7 @@ export interface SplitGroupExpense {
   splitBetweenUids: string[];
   createdAt: string; // ISO string date
   createdByUid: string;
+  type?: "expense" | "lend_borrow" | "repayment";
 }
 
 // Stored at `splitGroups/{groupId}/invites/{inviteId}`
@@ -72,4 +73,15 @@ export interface SplitGroupInvite {
   createdByUid: string;
   expiresAt: string; // ISO string date
   revoked: boolean;
+}
+
+// --- Personal Lend & Borrow Ledger ---
+export interface PersonalLendBorrow {
+  id: string;
+  friendName: string;
+  amount: number;
+  date: string; // ISO string date
+  description: string;
+  type: 'lend' | 'borrow' | 'repayment_to' | 'repayment_from';
+  createdAt: string; // ISO string date
 }
